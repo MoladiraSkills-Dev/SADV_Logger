@@ -6,7 +6,7 @@
  */
 
 // Replace this with your Google Apps Script Web App exec URL after deployment
-const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbygG1gU2wJz_CHANGE_ME_TO_YOUR_DEPLOYED_URL/exec";
+const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzBiWo7NGSKMCDVflPCGmnVfT46Blq-ZmdokXafVSf36-lfA-_Ob-4I28ukMR3nDAjD/exec";
 
 const SESSION_STORAGE_KEY = "sadv_logger_session";
 
@@ -52,7 +52,7 @@ async function callApi(method, args = {}) {
 const google = {
   script: {
     run: (function () {
-      let successFn = () => {};
+      let successFn = () => { };
       let failureFn = (err) => console.error("Unhandled API error:", err);
 
       const proxyTarget = {
@@ -116,7 +116,7 @@ const google = {
             const currentSuccess = successFn;
             const currentFailure = failureFn;
             // Reset handlers for next call
-            successFn = () => {};
+            successFn = () => { };
             failureFn = (err) => console.error(err);
 
             callApi(prop, apiArgs)
