@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SADV Staff Portal - Attendance &amp; Shift Logger | Live XTRA</title>
+  <meta name="description" content="SADV Employee Workspace Portal for verified geolocation clocking in/out, floor time logging, and leave management.">
+  <link rel="icon" href="https://sadv.co.za/wp-content/uploads/2026/04/SADV-favicon-150x150.png" type="image/png">
+  <link rel="stylesheet" href="../shared/css/base.css">
+  <link rel="stylesheet" href="employee.css">
+</head>
+<body>
+
+  <main style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem 1rem;">
+    <div class="container-narrow">
+      <div class="employee-card card-glass">
+
+        <!-- Top Status & Logout -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span class="badge badge-success">
+              <span class="pulse-active"></span> Verified Employee
+            </span>
+          </div>
+          <button onclick="logout()" class="btn btn-secondary btn-sm" id="btnEmployeeLogout" title="End Current Session">
+            Sign Out
+          </button>
+        </div>
+
+        <!-- Employee Identification Header -->
+        <header class="employee-header">
+          <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(5, 83, 160, 0.08); padding: 0.3rem 0.8rem; border-radius: var(--radius-pill); margin-bottom: 0.75rem;">
+            <span style="font-weight: 800; font-size: 0.8rem; color: var(--sadv-blue);">SADV</span>
+            <span style="font-weight: 800; font-size: 0.75rem; color: var(--sadv-pink);">Live XTRA</span>
+          </div>
+          <h1 style="font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.2rem;" id="empNameDisplay">
+            Welcome, Employee
+          </h1>
+          <p style="font-size: 0.8rem; color: var(--text-muted);" id="empEmailDisplay">
+            Loading session details...
+          </p>
+
+          <!-- Real-Time Live Clock Widget -->
+          <div style="margin-top: 1.25rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1rem;">
+            <div class="live-clock" id="liveClockTime">00:00:00</div>
+            <div class="live-date" id="liveClockDate">Loading Current Date...</div>
+          </div>
+        </header>
+
+        <!-- Dynamic Feedback Alert -->
+        <div id="clockAlert" class="alert hidden" role="alert"></div>
+
+        <!-- Clock Action Cards -->
+        <section class="clock-actions-grid" aria-label="Shift Clocking Actions">
+          <button type="button" class="clock-action-btn btn-clock-in" id="btnClockIn" onclick="triggerClockAction('Clock In')">
+            <div class="clock-btn-content">
+              <span class="clock-btn-icon">⏱️</span>
+              <div>
+                <span class="clock-btn-title">Clock In</span>
+                <span class="clock-btn-subtitle">Record Exact Morning Floor Time</span>
+              </div>
+            </div>
+            <span class="clock-btn-arrow">&#10132;</span>
+          </button>
+
+          <button type="button" class="clock-action-btn btn-clock-out" id="btnClockOut" onclick="triggerClockAction('Clock Out')">
+            <div class="clock-btn-content">
+              <span class="clock-btn-icon">🚪</span>
+              <div>
+                <span class="clock-btn-title">Clock Out</span>
+                <span class="clock-btn-subtitle">Standard Floor: 17:00 / Sat: 13:00</span>
+              </div>
+            </div>
+            <span class="clock-btn-arrow">&#10132;</span>
+          </button>
+        </section>
+
+        <!-- Leave Registration Action -->
+        <button type="button" class="btn btn-secondary btn-block" id="btnOpenLeave" onclick="openLeaveModal()" style="padding: 0.85rem; border-radius: var(--radius-md); font-weight: 700; margin-bottom: 1.25rem;">
+          📅 Register Leave Application
+        </button>
+
+        <!-- Geolocation Advisory Notice -->
+        <div class="location-indicator">
+          <span class="location-icon">📍</span>
+          <div class="location-details">
+            <span class="location-title">Automatic GPS Verification</span>
+            Browser location services are required for attendance compliance. Your physical address is resolved via reverse geocoding on each clock event.
+          </div>
+        </div>
+
+      </div>
+
+      <footer style="text-align: center; margin-top: 1.5rem; font-size: 0.75rem; color: var(--text-light);">
+        SA Digital Villages (Pty) Ltd &bull; SADV Logger Telemetry Core
+      </footer>
+    </div>
+  </main>
+
+  <!-- LEAVE REGISTRATION MODAL -->
+  <div id="leaveModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="leaveModalTitle">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="leaveModalTitle">
+          <span>📅</span> Request Work Leave
+        </h2>
+        <button type="button" class="modal-close" onclick="closeLeaveModal()" aria-label="Close modal">&times;</button>
+      </div>
+
+      <form id="leaveForm" onsubmit="handleLeaveSubmit(event, null)">
+        <div class="modal-body">
+          <div id="leaveAlert" class="alert hidden" role="alert"></div>
+
+          <div class="form-group">
+            <label class="form-label" for="leaveType">Leave Category</label>
+            <select id="leaveType" class="form-control" required>
+              <option value="Annual">Annual Leave (AL)</option>
+              <option value="Sick">Sick Leave (SL)</option>
+              <option value="Family Responsibility">Family Responsibility (FL)</option>
+              <option value="Unpaid">Unpaid Leave</option>
+              <option value="Other">Other Leave</option>
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="leaveStartDate">Start Date</label>
+              <input type="date" id="leaveStartDate" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="leaveEndDate">End Date</label>
+              <input type="date" id="leaveEndDate" class="form-control" required>
+            </div>
+          </div>
+
+          <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">
+            Once approved by your SADV manager, your leave days will be automatically annotated on your monthly timesheet.
+          </p>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeLeaveModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Submit Application</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Global Loader Element -->
+  <div id="globalSpinner" class="spinner-backdrop hidden" aria-live="polite">
+    <div class="spinner-disc"></div>
+    <div class="spinner-message" id="spinnerMsg">Processing telemetry...</div>
+  </div>
+
+  <script src="../shared/js/api.js"></script>
+  <script src="../shared/js/leave.js"></script>
+  <script src="employee.js"></script>
+</body>
+</html>

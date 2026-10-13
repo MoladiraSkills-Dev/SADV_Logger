@@ -1,0 +1,158 @@
+/* ==========================================================================
+   SADV LOGGER - EMPLOYEE PORTAL STYLES (employee/employee.css)
+   ========================================================================== */
+
+.employee-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: 2rem;
+  text-align: center;
+}
+
+.employee-header {
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.live-clock {
+  font-family: var(--font-mono);
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--sadv-blue);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0.5rem 0 0.2rem 0;
+}
+
+.live-date {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.clock-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.clock-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-radius: var(--radius-lg);
+  border: none;
+  cursor: pointer;
+  color: #ffffff;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
+}
+
+.clock-action-btn:active {
+  transform: scale(0.97);
+}
+
+.btn-clock-in {
+  background: linear-gradient(135deg, #0553a0 0%, #00b4d8 100%);
+  box-shadow: 0 6px 18px rgba(5, 83, 160, 0.25);
+}
+
+.btn-clock-in:hover {
+  box-shadow: 0 8px 24px rgba(5, 83, 160, 0.35);
+  transform: translateY(-2px);
+}
+
+.btn-clock-out {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  box-shadow: 0 6px 18px rgba(234, 88, 12, 0.25);
+}
+
+.btn-clock-out:hover {
+  box-shadow: 0 8px 24px rgba(234, 88, 12, 0.35);
+  transform: translateY(-2px);
+}
+
+.clock-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.clock-btn-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.clock-btn-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  display: block;
+}
+
+.clock-btn-subtitle {
+  font-size: 0.75rem;
+  opacity: 0.9;
+  font-weight: 500;
+  display: block;
+}
+
+.clock-btn-arrow {
+  font-size: 1.5rem;
+  font-weight: bold;
+  opacity: 0.8;
+  transition: transform 0.2s ease;
+}
+
+.clock-action-btn:hover .clock-btn-arrow {
+  transform: translateX(4px);
+  opacity: 1;
+}
+
+.location-indicator {
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  margin-top: 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  text-align: left;
+}
+
+.location-icon {
+  color: var(--sadv-cyan);
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.location-details {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.location-title {
+  font-weight: 700;
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: 0.15rem;
+}
+
+.pulse-active {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-success);
+  margin-right: 0.35rem;
+  animation: pulsePing 2s infinite;
+}

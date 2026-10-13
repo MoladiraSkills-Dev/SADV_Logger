@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SADV Logger - Sign In &amp; Registration Portal | Live XTRA</title>
+  <meta name="description" content="Secure Geolocation Attendance, Floor Time Verification, and Leave Management System for SA Digital Villages (SADV).">
+  <link rel="icon" href="https://sadv.co.za/wp-content/uploads/2026/04/SADV-favicon-150x150.png" type="image/png">
+  <link rel="stylesheet" href="shared/css/base.css">
+  <style>
+    .auth-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .auth-logo-badge {
+      display: inline-flex;
+      align-items: center;
+      background: linear-gradient(135deg, #0553a0 0%, #003a70 100%);
+      color: #fff;
+      padding: 0.6rem 1.4rem;
+      border-radius: var(--radius-md);
+      box-shadow: 0 4px 15px rgba(5, 83, 160, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      margin-bottom: 1rem;
+    }
+    .auth-logo-badge .badge-text {
+      font-size: 1.75rem;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+    }
+    .auth-logo-badge .badge-accent {
+      color: var(--sadv-pink);
+      font-size: 0.85rem;
+      font-weight: 800;
+      margin-left: 0.5rem;
+      background: rgba(255, 64, 180, 0.15);
+      padding: 0.2rem 0.6rem;
+      border-radius: var(--radius-pill);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .txt-blue { color: var(--sadv-blue); }
+    .txt-pink { color: var(--sadv-pink); }
+    .auth-subtitle {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+      line-height: 1.4;
+    }
+    .auth-footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-light);
+    }
+    .auth-switch-link {
+      color: var(--sadv-blue);
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .auth-switch-link:hover {
+      color: var(--sadv-pink);
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <main class="auth-page">
+    <div class="container-narrow">
+      <div class="card card-glass text-center">
+        
+        <!-- Brand Header -->
+        <header class="text-center" style="margin-bottom: 1.75rem;">
+          <div class="auth-logo-badge">
+            <span class="badge-text">SADV</span>
+            <span class="badge-accent">Live XTRA</span>
+          </div>
+          <h1 class="text-2xl font-extrabold" id="authTitle" style="font-size: 1.45rem;">
+            Welcome to <span class="txt-blue">SADV</span> <span class="txt-pink">Logger</span>
+          </h1>
+          <p class="auth-subtitle" id="authSubtitle">
+            Authenticate your workspace credentials to access telemetry attendance.
+          </p>
+        </header>
+
+        <!-- Dynamic Alert Container -->
+        <div id="authAlert" class="alert hidden" role="alert"></div>
+
+        <!-- LOGIN FORM -->
+        <form id="loginForm" onsubmit="handleLoginSubmit(event)" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="loginEmail">Work Email Address</label>
+            <input 
+              type="email" 
+              id="loginEmail" 
+              class="form-control" 
+              placeholder="e.g. employee@sadv.co.za" 
+              required 
+              autocomplete="email"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="loginPassword">Password</label>
+            <input 
+              type="password" 
+              id="loginPassword" 
+              class="form-control" 
+              placeholder="Enter your security password" 
+              required 
+              autocomplete="current-password"
+            >
+          </div>
+
+          <button type="submit" id="btnLoginSubmit" class="btn btn-primary btn-block" style="padding: 0.9rem; margin-top: 0.5rem;">
+            Authenticate Sign In
+          </button>
+
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1.25rem;">
+            New to SADV Logger? 
+            <span class="auth-switch-link" onclick="toggleAuthMode(false)">Create staff profile</span>
+          </p>
+        </form>
+
+        <!-- REGISTRATION FORM -->
+        <form id="registerForm" class="hidden" onsubmit="handleRegisterSubmit(event)" novalidate>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="regFirst">First Name</label>
+              <input type="text" id="regFirst" class="form-control" placeholder="First Name" required autocomplete="given-name">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="regLast">Last Name</label>
+              <input type="text" id="regLast" class="form-control" placeholder="Last Name" required autocomplete="family-name">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="regEmail">Company Email</label>
+            <input type="email" id="regEmail" class="form-control" placeholder="name@sadv.co.za" required autocomplete="email">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="regPassword">Create Password</label>
+            <input type="password" id="regPassword" class="form-control" placeholder="Minimum 6 characters" required autocomplete="new-password">
+          </div>
+
+          <button type="submit" id="btnRegisterSubmit" class="btn btn-pink btn-block" style="padding: 0.9rem; margin-top: 0.5rem;">
+            Complete Registration
+          </button>
+
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1.25rem;">
+            Already have a profile? 
+            <span class="auth-switch-link" onclick="toggleAuthMode(true)">Back to Sign In</span>
+          </p>
+        </form>
+
+      </div>
+
+      <footer class="auth-footer">
+        <p>&copy; 2026 SA Digital Villages (Pty) Ltd. Geolocation Attendance &amp; Shift Management.</p>
+        <p style="margin-top: 0.25rem;">Live XTRA &bull; <a href="https://sadv.co.za" target="_blank" rel="noopener">sadv.co.za</a></p>
+      </footer>
+    </div>
+  </main>
+
+  <!-- Global Loader Element -->
+  <div id="globalSpinner" class="spinner-backdrop hidden" aria-live="polite">
+    <div class="spinner-disc"></div>
+    <div class="spinner-message" id="spinnerMsg">Processing SADV request...</div>
+  </div>
+
+  <script src="shared/js/api.js"></script>
+  <script src="auth/auth.js"></script>
+</body>
+</html>

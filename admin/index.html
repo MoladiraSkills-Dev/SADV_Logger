@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SADV Admin Dashboard - Operations &amp; Shift Management | Live XTRA</title>
+  <meta name="description" content="Centralized Administrator Portal for SA Digital Villages (SADV) Attendance, Shift Logs, Legal Hour Compliance, and Payroll Timesheet Exports.">
+  <link rel="icon" href="https://sadv.co.za/wp-content/uploads/2026/04/SADV-favicon-150x150.png" type="image/png">
+  <link rel="stylesheet" href="../shared/css/base.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <main class="admin-wide">
+    
+    <!-- TOP ADMINISTRATIVE HEADER CARD -->
+    <header class="admin-header-card">
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.35rem;">
+          <div class="brand-logo-badge">
+            SADV <span class="badge-xtra">Live XTRA</span>
+          </div>
+          <span class="brand-tag">Operations Core</span>
+        </div>
+        <h1 style="font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin: 0.2rem 0;" id="adminGreeting">
+          Manager Operations Dashboard
+        </h1>
+        <p style="font-size: 0.8rem; color: var(--text-muted);">
+          South African Digital Villages &bull; Verified Telemetry &amp; Compliance Management
+        </p>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;">
+        <button type="button" class="btn btn-secondary btn-sm" id="btnToggleSelfClock" onclick="toggleAdminClockPanel()">
+          ⏱️ <span id="adminClockToggleText">Admin Attendance Logging</span>
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="triggerSmartSync()" title="Re-sync historical logs">
+          🔄 Smart Sync
+        </button>
+        <button type="button" class="btn btn-outline-danger btn-sm" onclick="logout()" id="btnAdminLogout" title="Terminate current session">
+          Sign Out
+        </button>
+      </div>
+    </header>
+
+    <!-- ADMIN SELF ATTENDANCE PANEL (Collapsible) -->
+    <section id="adminSelfClockPanel" class="admin-clock-box hidden" aria-label="Administrator Self Attendance Panel">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <h2 style="font-size: 1.1rem; font-weight: 800; color: var(--sadv-blue); margin-bottom: 0.15rem;">
+            Administrator Attendance Logging
+          </h2>
+          <p style="font-size: 0.75rem; color: var(--text-muted);">
+            Record your personal attendance telemetry directly without signing out of the management console.
+          </p>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="toggleAdminClockPanel()">Close Panel</button>
+      </div>
+
+      <div id="adminLogAlert" class="alert hidden" role="alert"></div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem;">
+        <button type="button" class="btn btn-primary" onclick="triggerAdminClockAction('Clock In')">
+          ⏱️ Clock In (Exact Floor)
+        </button>
+        <button type="button" class="btn btn-pink" onclick="triggerAdminClockAction('Clock Out')">
+          🚪 Clock Out (Standard Floor)
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="openLeaveModal()">
+          📅 Request Personal Leave
+        </button>
+      </div>
+    </section>
+
+    <!-- NAVIGATION TABS -->
+    <nav class="tabs-nav" style="margin-bottom: 1.5rem;" aria-label="Dashboard Management Views">
+      <button type="button" id="btn-logsTab" class="tab-btn active" onclick="switchAdminTab('logsTab')">
+        Telemetry Activity Logs
+      </button>
+      <button type="button" id="btn-summariesTab" class="tab-btn" onclick="switchAdminTab('summariesTab')">
+        Daily Shift Summaries
+      </button>
+      <button type="button" id="btn-weeklyTab" class="tab-btn" onclick="switchAdminTab('weeklyTab')">
+        Weekly Work &amp; Limits
+      </button>
+      <button type="button" id="btn-monthlyTab" class="tab-btn" onclick="switchAdminTab('monthlyTab')">
+        Monthly Summaries
+      </button>
+      <button type="button" id="btn-leaveTab" class="tab-btn" onclick="switchAdminTab('leaveTab')">
+        Leave Applications
+      </button>
+      <button type="button" id="btn-usersTab" class="tab-btn" onclick="switchAdminTab('usersTab')">
+        Staff Directory
+      </button>
+      <button type="button" id="btn-exportTab" class="tab-btn" onclick="switchAdminTab('exportTab')">
+        Timesheet Export Engine
+      </button>
+    </nav>
+
+    <!-- ====================================================================
+         TAB 1: ACTIVITY LOGS
+         ==================================================================== -->
+    <section id="content-logsTab" class="card" style="padding: 0; overflow: hidden;">
+      <div class="table-toolbar">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;">
+          <h2 style="font-size: 1rem; font-weight: 800; color: var(--text-primary); margin: 0;">
+            Real-Time Activity Telemetry
+          </h2>
+          <!-- Live Login/Logout Stat Counters -->
+          <div class="admin-stat-counter">
+            <div class="stat-item">
+              <span class="pulse-dot" style="color: var(--sadv-blue);"></span>
+              <span class="stat-label">Logins:</span>
+              <span class="stat-val-in" id="statLogins">0</span>
+            </div>
+            <div style="width: 1px; height: 16px; background: var(--border-color);"></div>
+            <div class="stat-item">
+              <span class="pulse-dot" style="color: #ea580c;"></span>
+              <span class="stat-label">Logouts:</span>
+              <span class="stat-val-out" id="statLogouts">0</span>
+            </div>
+            <span style="font-size: 0.7rem; color: var(--text-light); font-family: var(--font-mono); margin-left: 0.5rem;" id="statDateDisplay">Today</span>
+          </div>
+        </div>
+
+        <div class="toolbar-filters">
+          <input type="date" id="filterDate" class="toolbar-input" onchange="applyAdminLogFilters()" title="Filter logs by date">
+          <input type="text" id="filterSearch" class="toolbar-input" oninput="applyAdminLogFilters()" placeholder="Search staff name or email..." style="min-width: 200px;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="resetAdminLogFilters()">Reset</button>
+        </div>
+      </div>
+
+      <div class="table-container" style="border: none; border-radius: 0;">
+        <table class="table-custom">
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Date &amp; Time</th>
+              <th>Action</th>
+              <th>Resolved Physical Address &amp; GPS</th>
+              <th>Admin Edit Flag</th>
+            </tr>
+          </thead>
+          <tbody id="logsTableBody">
+            <!-- Rendered dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         TAB 2: DAILY SUMMARIES
+         ==================================================================== -->
+    <section id="content-summariesTab" class="card hidden" style="padding: 0; overflow: hidden;">
+      <div class="table-toolbar">
+        <div>
+          <h2 style="font-size: 1rem; font-weight: 800; color: var(--text-primary); margin: 0;">
+            Daily Shifts &amp; Floor Times
+          </h2>
+          <span style="font-size: 0.7rem; color: var(--text-muted);">
+            Floor Rules: Exact clock-in (HH:mm, no seconds) &bull; Standard end: 17:00 / Sat 13:00 &bull; -1h lunch deduction Mon-Fri
+          </span>
+        </div>
+
+        <div class="toolbar-filters">
+          <input type="date" id="filterSummaryDate" class="toolbar-input" onchange="applyAdminSummaryFilters()" title="Filter by date">
+          <input type="text" id="filterSummarySearch" class="toolbar-input" oninput="applyAdminSummaryFilters()" placeholder="Search staff name/email..." style="min-width: 200px;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="resetAdminSummaryFilters()">Reset</button>
+        </div>
+      </div>
+
+      <div class="table-container" style="border: none; border-radius: 0;">
+        <table class="table-custom">
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Date</th>
+              <th>Actual Telemetry</th>
+              <th>Floor Times</th>
+              <th>Net Hours Worked</th>
+              <th>Overtime Hours</th>
+              <th>Status</th>
+              <th class="text-right">Shift Actions</th>
+            </tr>
+          </thead>
+          <tbody id="summariesTableBody">
+            <!-- Rendered dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         TAB 3: WEEKLY SUMMARIES
+         ==================================================================== -->
+    <section id="content-weeklyTab" class="card hidden" style="padding: 0; overflow: hidden;">
+      <div class="table-toolbar">
+        <div>
+          <h2 style="font-size: 1rem; font-weight: 800; color: var(--text-primary); margin: 0;">
+            Weekly Work Summaries &amp; Legal Compliance Limits
+          </h2>
+          <span class="badge badge-info" style="margin-top: 0.25rem;">Target: 45h - 54h &bull; Max Legal Cap: 55h</span>
+        </div>
+
+        <div class="toolbar-filters">
+          <input type="text" id="filterWeeklyKey" class="toolbar-input" oninput="applyAdminWeeklyFilters()" placeholder="Week e.g. 2026-W30">
+          <input type="text" id="filterWeeklySearch" class="toolbar-input" oninput="applyAdminWeeklyFilters()" placeholder="Search staff..." style="min-width: 200px;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="resetAdminWeeklyFilters()">Reset</button>
+        </div>
+      </div>
+
+      <div class="table-container" style="border: none; border-radius: 0;">
+        <table class="table-custom">
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>ISO Week</th>
+              <th>Total Hours Worked</th>
+              <th>Total Overtime</th>
+              <th>Days Worked</th>
+              <th>Compliance Status</th>
+            </tr>
+          </thead>
+          <tbody id="weeklyTableBody">
+            <!-- Rendered dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         TAB 4: MONTHLY SUMMARIES
+         ==================================================================== -->
+    <section id="content-monthlyTab" class="card hidden" style="padding: 0; overflow: hidden;">
+      <div class="table-toolbar">
+        <h2 style="font-size: 1rem; font-weight: 800; color: var(--text-primary); margin: 0;">
+          Month-to-Date Accumulated Totals
+        </h2>
+
+        <div class="toolbar-filters">
+          <input type="month" id="filterMonthlyMonth" class="toolbar-input" onchange="applyAdminMonthlyFilters()">
+          <input type="text" id="filterMonthlySearch" class="toolbar-input" oninput="applyAdminMonthlyFilters()" placeholder="Search staff..." style="min-width: 200px;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="resetAdminMonthlyFilters()">Reset</button>
+        </div>
+      </div>
+
+      <div class="table-container" style="border: none; border-radius: 0;">
+        <table class="table-custom">
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Month</th>
+              <th>Total Regular Hours</th>
+              <th>Total Overtime</th>
+              <th>Days Worked</th>
+              <th>Last Synced</th>
+            </tr>
+          </thead>
+          <tbody id="monthlyTableBody">
+            <!-- Rendered dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         TAB 5: LEAVE APPLICATIONS
+         ==================================================================== -->
+    <section id="content-leaveTab" class="card hidden" style="padding: 0; overflow: hidden;">
+      <div class="table-toolbar">
+        <h2 style="font-size: 1rem; font-weight: 800; color: var(--text-primary); margin: 0;">
+          Staff Leave Applications &amp; Decisions
+        </h2>
+      </div>
+
+      <div class="table-container" style="border: none; border-radius: 0;">
+        <table class="table-custom">
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Leave Category</th>
+              <th>Scheduled Period</th>
+              <th>Decision Status</th>
+              <th class="text-right">Approval Actions</th>
+            </tr>
+          </thead>
+          <tbody id="leaveTableBody">
+            <!-- Rendered dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         TAB 6: STAFF DIRECTORY
+         ==================================================================== -->
+    <section id="content-usersTab" class="card hidden" style="padding: 0; overflow: hidden;">
+      <div class="table-toolbar">
+        <h2 style="font-size: 1rem; font-weight: 800; color: var(--text-primary); margin: 0;">
+          Registered Staff Directory &amp; Security
+        </h2>
+      </div>
+
+      <div class="table-container" style="border: none; border-radius: 0;">
+        <table class="table-custom">
+          <thead>
+            <tr>
+              <th>Employee Name &amp; Email</th>
+              <th>Work Status</th>
+              <th>Account Standing</th>
+              <th class="text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <!-- Rendered dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         TAB 7: TIMESHEET EXPORT ENGINE
+         ==================================================================== -->
+    <section id="content-exportTab" class="export-card hidden">
+      <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 1.25rem; margin-bottom: 1.75rem;">
+        <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--sadv-blue); margin-bottom: 0.25rem;">
+          Official Timesheet Export Engine
+        </h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">
+          Generate and export SADV branded monthly timesheet documentation for payroll audits, supervisor signatures, and legal compliance.
+        </p>
+      </div>
+
+      <form onsubmit="return false;" style="max-width: 800px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+          <div class="form-group">
+            <label class="form-label" for="exportEmail">Select Staff Member</label>
+            <select id="exportEmail" class="form-control" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="exportStart">Start Date</label>
+            <input type="date" id="exportStart" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="exportEnd">End Date</label>
+            <input type="date" id="exportEnd" class="form-control" required>
+          </div>
+        </div>
+
+        <div id="exportAlert" class="alert hidden" role="alert"></div>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; padding-top: 0.5rem;">
+          <button type="button" onclick="handleExport('pdf')" class="btn btn-primary" id="btnExportPdf">
+            📄 Export Timesheet (PDF)
+          </button>
+          <button type="button" onclick="handleExport('csv')" class="btn btn-secondary" id="btnExportCsv">
+            📊 Export Timesheet (CSV)
+          </button>
+          <button type="button" onclick="requestZipExport()" class="btn btn-pink" id="btnExportZip">
+            📦 Export Multi-Staff Archive (.ZIP)
+          </button>
+        </div>
+      </form>
+    </section>
+
+  </main>
+
+  <!-- ======================================================================
+       MODAL 1: EDIT DAILY SHIFT TIMES
+       ====================================================================== -->
+  <div id="editSummaryModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="editSumTitle">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="editSumTitle">
+          ⏱️ Modify Shift Timestamps
+        </h3>
+        <button type="button" class="modal-close" onclick="closeSummaryEditModal()" aria-label="Close modal">&times;</button>
+      </div>
+
+      <form onsubmit="handleSummaryUpdateSave(event)">
+        <input type="hidden" id="editSumId">
+
+        <div class="modal-body">
+          <div style="background: #f8fafc; border: 1px solid var(--border-color); padding: 0.85rem 1rem; border-radius: var(--radius-md); margin-bottom: 1.25rem;">
+            <strong style="display: block; color: var(--text-primary); font-size: 0.95rem;" id="editSumName"></strong>
+            <span style="font-size: 0.8rem; color: var(--text-muted);" id="editSumDate"></span>
+            <p style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.5rem; line-height: 1.3;">
+              Admin adjustment flag will be recorded. Overtime will be precisely separated for any minutes extending past standard end floor time (17:00 / Sat 13:00).
+            </p>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="editSumIn">Floor Clock In</label>
+              <input type="time" step="1" id="editSumIn" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="editSumOut">Floor Clock Out</label>
+              <input type="time" step="1" id="editSumOut" class="form-control" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeSummaryEditModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Save Adjustments</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODAL 2: MODIFY STAFF PROFILE
+       ====================================================================== -->
+  <div id="editModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="editProfTitle">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="editProfTitle">
+          👤 Staff Profile &amp; Access Credentials
+        </h3>
+        <button type="button" class="modal-close" onclick="closeEditModal()" aria-label="Close modal">&times;</button>
+      </div>
+
+      <form onsubmit="handleAdminUpdateSave(event)">
+        <input type="hidden" id="editEmail">
+
+        <div class="modal-body">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="editFirst">First Name</label>
+              <input type="text" id="editFirst" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="editLast">Last Name</label>
+              <input type="text" id="editLast" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="editStatus">Account Standing</label>
+            <select id="editStatus" class="form-control">
+              <option value="Verified">Verified (Active Login Allowed)</option>
+              <option value="Blocked">Blocked (Access Revoked)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="editPassword" style="color: var(--sadv-blue);">
+              Reset Password (Leave blank to keep current)
+            </label>
+            <input type="password" id="editPassword" class="form-control" placeholder="Enter new password if resetting">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeEditModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Save Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODAL 3: ADMIN LEAVE REGISTRATION
+       ====================================================================== -->
+  <div id="leaveModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="adminLeaveTitle">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="adminLeaveTitle">
+          📅 Register Administrative Leave
+        </h3>
+        <button type="button" class="modal-close" onclick="closeLeaveModal()" aria-label="Close modal">&times;</button>
+      </div>
+
+      <form id="leaveForm" onsubmit="handleLeaveSubmit(event, loadAdminDashboard)">
+        <div class="modal-body">
+          <div id="leaveAlert" class="alert hidden" role="alert"></div>
+
+          <div class="form-group">
+            <label class="form-label" for="leaveType">Leave Category</label>
+            <select id="leaveType" class="form-control" required>
+              <option value="Annual">Annual Leave (AL)</option>
+              <option value="Sick">Sick Leave (SL)</option>
+              <option value="Family Responsibility">Family Responsibility (FL)</option>
+              <option value="Unpaid">Unpaid Leave</option>
+              <option value="Other">Other Leave</option>
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div class="form-group">
+              <label class="form-label" for="leaveStartDate">Start Date</label>
+              <input type="date" id="leaveStartDate" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="leaveEndDate">End Date</label>
+              <input type="date" id="leaveEndDate" class="form-control" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="closeLeaveModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Submit Application</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Global Loader Element -->
+  <div id="globalSpinner" class="spinner-backdrop hidden" aria-live="polite">
+    <div class="spinner-disc"></div>
+    <div class="spinner-message" id="spinnerMsg">Processing telemetry...</div>
+  </div>
+
+  <script src="../shared/js/api.js"></script>
+  <script src="../shared/js/leave.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
