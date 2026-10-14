@@ -800,21 +800,6 @@ async function requestZipExport() {
    MAINTENANCE UTILITIES
    ========================================================================== */
 
-async function triggerSmartSync() {
-  if (!confirm("Run Smart Sync? This will scan historical Activity Logs and recalculate Daily, Weekly, and Monthly summaries.")) return;
-  showLoader(true, "Executing Smart Historical Sync on Google Sheets...");
-
-  try {
-    const res = await callApi("extractExistingLogsToDailySummaries");
-    showLoader(false);
-    alert(res.message);
-    loadAdminDashboard();
-  } catch (err) {
-    showLoader(false);
-    alert("Smart Sync Error: " + err.message);
-  }
-}
-
 async function triggerFloorTimeReset() {
   if (!confirm("Reset all historical shift Clock-Out floor times to 17:00 (13:00 Saturday) and recalculate standard hours?")) return;
   showLoader(true, "Resetting floor times across database...");
