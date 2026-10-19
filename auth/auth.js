@@ -59,7 +59,7 @@ async function handleLoginSubmit(e) {
     showLoader(false);
 
     if (res.status === "success") {
-      saveSession(res.user, res.accountType);
+      saveSession(res.user, res.accountType, res.todayShift || null);
       showAlert("authAlert", `Welcome back, ${res.user.firstName}! Redirecting...`, "success");
 
       setTimeout(() => {

@@ -195,6 +195,15 @@ a:hover {
   transform: scale(0.97);
 }
 
+.btn:disabled,
+.btn[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
 .btn-primary {
   background: var(--grad-sadv);
   color: #ffffff;

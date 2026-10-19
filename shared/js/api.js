@@ -81,6 +81,9 @@ const google = {
               case "loginUser":
                 apiArgs = { email: args[0], password: args[1] };
                 break;
+              case "getTodayShiftStatus":
+                apiArgs = { email: args[0] };
+                break;
               case "processActivityLog":
                 apiArgs = { email: args[0], firstName: args[1], lastName: args[2], action: args[3], lat: args[4], lon: args[5] };
                 break;
@@ -135,13 +138,22 @@ const google = {
    SESSION & AUTH STORAGE HELPERS
    ========================================================================== */
 
-function saveSession(user, accountType) {
+function saveSession(user, accountType, todayShift = null) {
   const sessionData = {
     user: user,
     accountType: accountType,
+    todayShift: todayShift,
     loginTimestamp: new Date().toISOString()
   };
   sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(sessionData));
+}
+
+function updateSessionShift(todayShift) {
+  const session = getSession();
+  if (session) {
+    session.todayShift = todayShift;
+    sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
+  }
 }
 
 function getSession() {

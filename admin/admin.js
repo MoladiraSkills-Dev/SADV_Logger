@@ -77,6 +77,7 @@ async function loadAdminDashboard() {
       applyAdminSummaryFilters();
       applyAdminWeeklyFilters();
       applyAdminMonthlyFilters();
+      updateAdminAttendanceButtonStates();
     } else {
       alert("Error loading dashboard data: " + res.message);
     }
@@ -117,14 +118,100 @@ function toggleAdminClockPanel() {
   if (panel.classList.contains("hidden")) {
     panel.classList.remove("hidden");
     if (toggleBtn) toggleBtn.innerText = "Hide Clocking Panel";
+    updateAdminAttendanceButtonStates();
   } else {
     panel.classList.add("hidden");
     if (toggleBtn) toggleBtn.innerText = "Admin Attendance Logging";
   }
 }
 
+function updateAdminAttendanceButtonStates() {
+  const btnIn = document.getElementById("btnAdminClockIn");
+  const btnOut = document.getElementById("btnAdminClockOut");
+  const hint = document.getElementById("adminClockStatusHint");
+  if (!btnIn || !btnOut || !currentSession || !currentSession.user) return;
+
+  const todayStr = new Date().toISOString().split("T")[0];
+  const adminEmail = (currentSession.user.email || "").trim().toLowerCase();
+
+  let hasClockedIn = false;
+  let hasClockedOut = false;
+  let inTime = "";
+  let outTime = "";
+
+  (CACHED_SUMMARIES_ARRAY || []).forEach(s => {
+    if (String(s.email).trim().toLowerCase() === adminEmail && String(s.date).trim() === todayStr) {
+      if (s.clockIn && s.clockIn !== "--") {
+        hasClockedIn = true;
+        inTime = s.clockIn;
+      }
+      if (s.clockOut && s.clockOut !== "--") {
+        hasClockedOut = true;
+        outTime = s.clockOut;
+      }
+    }
+  });
+
+  (CACHED_LOGS_ARRAY || []).forEach(l => {
+    if (String(l.email).trim().toLowerCase() === adminEmail && String(l.date).trim() === todayStr) {
+      if (l.action === "Clock In") {
+        hasClockedIn = true;
+        if (!inTime) inTime = l.time;
+      } else if (l.action === "Clock Out") {
+        hasClockedOut = true;
+        if (!outTime) outTime = l.time;
+      }
+    }
+  });
+
+  if (hasClockedOut) {
+    btnIn.disabled = true;
+    btnIn.title = "Shift completed today";
+    btnOut.disabled = true;
+    btnOut.title = "Shift completed today";
+    if (hint) hint.innerText = `Daily shift completed for today (${outTime || "--"}).`;
+  } else if (hasClockedIn) {
+    btnIn.disabled = true;
+    btnIn.title = "Already clocked in today";
+    btnOut.disabled = false;
+    btnOut.title = "Clock out and conclude daily shift";
+    if (hint) hint.innerText = `Active shift in progress since ${inTime || "--"}. Ready to clock out.`;
+  } else {
+    btnIn.disabled = false;
+    btnIn.title = "Clock in for morning shift";
+    btnOut.disabled = true;
+    btnOut.title = "You cannot clock out until you have clocked in for today";
+    if (hint) hint.innerText = "Clock in first to enable clock out";
+  }
+}
+
 function triggerAdminClockAction(actionType) {
   hideAlert("adminLogAlert");
+
+  // Strict Client-Side Guard: Prevent Clock Out without Clock In
+  if (actionType === "Clock Out") {
+    const todayStr = new Date().toISOString().split("T")[0];
+    const adminEmail = (currentSession.user.email || "").trim().toLowerCase();
+    let hasClockedIn = false;
+
+    (CACHED_SUMMARIES_ARRAY || []).forEach(s => {
+      if (String(s.email).trim().toLowerCase() === adminEmail && String(s.date).trim() === todayStr && s.clockIn && s.clockIn !== "--") {
+        hasClockedIn = true;
+      }
+    });
+
+    (CACHED_LOGS_ARRAY || []).forEach(l => {
+      if (String(l.email).trim().toLowerCase() === adminEmail && String(l.date).trim() === todayStr && l.action === "Clock In") {
+        hasClockedIn = true;
+      }
+    });
+
+    if (!hasClockedIn) {
+      showAlert("adminLogAlert", "Action Blocked: You cannot clock out because you have not clocked in for today yet. Please clock in first.", "danger");
+      return;
+    }
+  }
+
   showLoader(true, `Acquiring GPS coordinates for Admin ${actionType}...`);
 
   if (!navigator.geolocation) {

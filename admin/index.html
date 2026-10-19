@@ -57,16 +57,17 @@
       <div id="adminLogAlert" class="alert hidden" role="alert"></div>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem;">
-        <button type="button" class="btn btn-primary" onclick="triggerAdminClockAction('Clock In')">
+        <button type="button" id="btnAdminClockIn" class="btn btn-primary" onclick="triggerAdminClockAction('Clock In')">
           ⏱️ Clock In (Exact Floor)
         </button>
-        <button type="button" class="btn btn-pink" onclick="triggerAdminClockAction('Clock Out')">
+        <button type="button" id="btnAdminClockOut" class="btn btn-pink" onclick="triggerAdminClockAction('Clock Out')" disabled title="You must clock in before you can clock out">
           🚪 Clock Out (Standard Floor)
         </button>
         <button type="button" class="btn btn-secondary" onclick="openLeaveModal()">
           📅 Request Personal Leave
         </button>
       </div>
+      <div id="adminClockStatusHint" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.35rem;">Clock in first to enable clock out</div>
     </section>
 
     <!-- NAVIGATION TABS -->

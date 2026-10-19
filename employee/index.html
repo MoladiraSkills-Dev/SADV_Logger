@@ -57,21 +57,27 @@
               <span class="clock-btn-icon">⏱️</span>
               <div>
                 <span class="clock-btn-title">Clock In</span>
-                <span class="clock-btn-subtitle">Record Exact Morning Floor Time</span>
+                <span class="clock-btn-subtitle" id="clockInSubtitle">Record Exact Morning Floor Time</span>
               </div>
             </div>
-            <span class="clock-btn-arrow">&#10132;</span>
+            <div class="action-btn-right">
+              <span class="action-badge-pill hidden" id="clockInBadge">✓ Clocked In</span>
+              <span class="clock-btn-arrow">&#10132;</span>
+            </div>
           </button>
 
-          <button type="button" class="clock-action-btn btn-clock-out" id="btnClockOut" onclick="triggerClockAction('Clock Out')">
+          <button type="button" class="clock-action-btn btn-clock-out" id="btnClockOut" onclick="triggerClockAction('Clock Out')" disabled title="You must clock in before you can clock out">
             <div class="clock-btn-content">
               <span class="clock-btn-icon">🚪</span>
               <div>
                 <span class="clock-btn-title">Clock Out</span>
-                <span class="clock-btn-subtitle">Standard Floor: 17:00 / Sat: 13:00</span>
+                <span class="clock-btn-subtitle" id="clockOutSubtitle">Clock in first to enable clock out</span>
               </div>
             </div>
-            <span class="clock-btn-arrow">&#10132;</span>
+            <div class="action-btn-right">
+              <span class="action-badge-pill" id="clockOutBadge">Clock-In Required</span>
+              <span class="clock-btn-arrow">&#10132;</span>
+            </div>
           </button>
         </section>
 

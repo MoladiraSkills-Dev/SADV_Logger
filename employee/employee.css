@@ -110,9 +110,35 @@
   transition: transform 0.2s ease;
 }
 
-.clock-action-btn:hover .clock-btn-arrow {
+.clock-action-btn:hover:not(:disabled) .clock-btn-arrow {
   transform: translateX(4px);
   opacity: 1;
+}
+
+.clock-action-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: grayscale(0.45);
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.action-btn-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.action-badge-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+  letter-spacing: 0.02em;
 }
 
 .location-indicator {
