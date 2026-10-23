@@ -55,6 +55,11 @@ SADV_Logger/
    - `Monthly_Summaries`
    - `Leave_Requests`
 
+### Step 1b: Google Sheets Custom Menu Tab
+Whenever you open or reload your Google Sheet, a custom top-level menu tab **`⚡ SADV Logger`** appears in the spreadsheet toolbar:
+- **`🔄 Extract Logs to Daily Summaries (Calculate Hours)`**: Automatically synchronizes unlinked activity logs into daily summaries, calculates floor hours and overtime, updates pending shifts, and aggregates weekly and monthly totals with real-time popup confirmation.
+- **`🕒 Standardize Clock-Out Floor Times`**: Ensures historical records adhere strictly to standardized floor out policies.
+
 ### Step 2: Deploy Backend Web App
 1. In Apps Script, click **Deploy** → **New deployment**.
 2. Click the gear icon next to "Select type" and choose **Web app**.
