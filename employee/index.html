@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SADV Staff Portal - Attendance &amp; Shift Logger | Live XTRA</title>
-  <meta name="description" content="SADV Employee Workspace Portal for verified geolocation clocking in/out, floor time logging, and leave management.">
+  <meta name="description"
+    content="SADV Employee Workspace Portal for verified geolocation clocking in/out, floor time logging, and leave management.">
   <link rel="icon" href="https://sadv.co.za/wp-content/uploads/2026/04/SADV-favicon-150x150.png" type="image/png">
   <link rel="stylesheet" href="../shared/css/base.css">
   <link rel="stylesheet" href="employee.css">
 </head>
+
 <body>
 
   <main style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem 1rem;">
@@ -22,18 +25,21 @@
               <span class="pulse-active"></span> Verified Employee
             </span>
           </div>
-          <button onclick="logout()" class="btn btn-secondary btn-sm" id="btnEmployeeLogout" title="End Current Session">
+          <button onclick="logout()" class="btn btn-secondary btn-sm" id="btnEmployeeLogout"
+            title="End Current Session">
             Sign Out
           </button>
         </div>
 
         <!-- Employee Identification Header -->
         <header class="employee-header">
-          <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(5, 83, 160, 0.08); padding: 0.3rem 0.8rem; border-radius: var(--radius-pill); margin-bottom: 0.75rem;">
+          <div
+            style="display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(5, 83, 160, 0.08); padding: 0.3rem 0.8rem; border-radius: var(--radius-pill); margin-bottom: 0.75rem;">
             <span style="font-weight: 800; font-size: 0.8rem; color: var(--sadv-blue);">SADV</span>
             <span style="font-weight: 800; font-size: 0.75rem; color: var(--sadv-pink);">Live XTRA</span>
           </div>
-          <h1 style="font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.2rem;" id="empNameDisplay">
+          <h1 style="font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.2rem;"
+            id="empNameDisplay">
             Welcome, Employee
           </h1>
           <p style="font-size: 0.8rem; color: var(--text-muted);" id="empEmailDisplay">
@@ -41,7 +47,8 @@
           </p>
 
           <!-- Real-Time Live Clock Widget -->
-          <div style="margin-top: 1.25rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1rem;">
+          <div
+            style="margin-top: 1.25rem; background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1rem;">
             <div class="live-clock" id="liveClockTime">00:00:00</div>
             <div class="live-date" id="liveClockDate">Loading Current Date...</div>
           </div>
@@ -52,12 +59,14 @@
 
         <!-- Clock Action Cards -->
         <section class="clock-actions-grid" aria-label="Shift Clocking Actions">
-          <button type="button" class="clock-action-btn btn-clock-in" id="btnClockIn" onclick="triggerClockAction('Clock In')">
+          <button type="button" class="clock-action-btn btn-clock-in" id="btnClockIn"
+            onclick="triggerClockAction('Clock In')">
             <div class="clock-btn-content">
               <span class="clock-btn-icon">⏱️</span>
               <div>
                 <span class="clock-btn-title">Clock In</span>
-                <span class="clock-btn-subtitle" id="clockInSubtitle">Standard Floor: 08:00 (or actual time if after 08:00)</span>
+                <span class="clock-btn-subtitle" id="clockInSubtitle">Standard Floor: 08:00 (or actual time if after
+                  08:00)</span>
               </div>
             </div>
             <div class="action-btn-right">
@@ -66,7 +75,8 @@
             </div>
           </button>
 
-          <button type="button" class="clock-action-btn btn-clock-out" id="btnClockOut" onclick="triggerClockAction('Clock Out')" disabled title="You must clock in before you can clock out">
+          <button type="button" class="clock-action-btn btn-clock-out" id="btnClockOut"
+            onclick="triggerClockAction('Clock Out')" disabled title="You must clock in before you can clock out">
             <div class="clock-btn-content">
               <span class="clock-btn-icon">🚪</span>
               <div>
@@ -82,9 +92,11 @@
         </section>
 
         <!-- Leave Registration Action -->
-        <button type="button" class="btn btn-secondary btn-block" id="btnOpenLeave" onclick="openLeaveModal()" style="padding: 0.85rem; border-radius: var(--radius-md); font-weight: 700; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; position: relative;">
+        <button type="button" class="btn btn-secondary btn-block" id="btnOpenLeave" onclick="openLeaveModal()"
+          style="padding: 0.85rem; border-radius: var(--radius-md); font-weight: 700; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; position: relative;">
           <span>📅 Register Leave Application</span>
-          <span id="employeeLeaveBadge" class="badge badge-warning hidden" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; border-radius: 999px;">0 Pending</span>
+          <span id="employeeLeaveBadge" class="badge badge-warning hidden"
+            style="font-size: 0.72rem; padding: 0.2rem 0.55rem; border-radius: 999px;">0 Pending</span>
         </button>
 
         <!-- Geolocation Advisory Notice -->
@@ -92,7 +104,8 @@
           <span class="location-icon">📍</span>
           <div class="location-details">
             <span class="location-title">Automatic GPS Verification</span>
-            Browser location services are required for attendance compliance. Your physical address is resolved via reverse geocoding on each clock event.
+            Browser location services are required for attendance compliance. Your physical address is resolved via
+            reverse geocoding on each clock event.
           </div>
         </div>
 
@@ -141,7 +154,8 @@
           </div>
 
           <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">
-            Once approved by your SADV manager, your leave days will be automatically annotated on your monthly timesheet.
+            Once approved by your SADV manager, your leave days will be automatically annotated on your monthly
+            timesheet.
           </p>
         </div>
 
@@ -163,4 +177,5 @@
   <script src="../shared/js/leave.js"></script>
   <script src="employee.js"></script>
 </body>
+
 </html>
