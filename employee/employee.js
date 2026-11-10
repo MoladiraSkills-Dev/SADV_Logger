@@ -40,9 +40,27 @@ async function fetchTodayShiftStatus() {
     if (res && res.status === "success" && res.todayShift) {
       updateEmployeeShiftUI(res.todayShift);
       updateSessionShift(res.todayShift);
+      updateEmployeeLeaveBadge(res.pendingLeaveCount, res.activeLeave);
     }
   } catch (err) {
     console.warn("Could not retrieve real-time shift status:", err);
+  }
+}
+
+function updateEmployeeLeaveBadge(pendingCount, activeLeave) {
+  const badge = document.getElementById("employeeLeaveBadge");
+  if (!badge) return;
+
+  if (activeLeave) {
+    badge.innerText = `● On ${activeLeave}`;
+    badge.className = "badge badge-info";
+    badge.classList.remove("hidden");
+  } else if (pendingCount && pendingCount > 0) {
+    badge.innerText = `${pendingCount} Pending`;
+    badge.className = "badge badge-warning";
+    badge.classList.remove("hidden");
+  } else {
+    badge.classList.add("hidden");
   }
 }
 
@@ -100,7 +118,7 @@ function updateEmployeeShiftUI(shift) {
     // Has not clocked in yet -> strictly forbid clock-out
     btnIn.disabled = false;
     btnIn.title = "Clock in for your morning shift";
-    if (inSub) inSub.innerText = "Record Exact Morning Floor Time";
+    if (inSub) inSub.innerText = "Standard Floor: 08:00 (or actual time if after 08:00)";
     if (inBadge) {
       inBadge.classList.add("hidden");
     }
@@ -183,11 +201,27 @@ function triggerClockAction(actionType) {
           );
 
           if (actionType === "Clock In") {
+            const rawTime = res.time || "";
+            let floorInTime = "--";
+            if (rawTime) {
+              const parts = rawTime.split(":");
+              if (parts.length >= 2) {
+                const hr = parseInt(parts[0], 10);
+                const min = parseInt(parts[1], 10);
+                if (hr < 8) {
+                  floorInTime = "08:00";
+                } else {
+                  floorInTime = `${String(hr).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+                }
+              } else {
+                floorInTime = rawTime.substring(0, 5);
+              }
+            }
             const newShift = {
               date: res.date,
               clockIn: res.time,
               clockOut: "--",
-              floorIn: res.time ? res.time.substring(0, 5) : "--",
+              floorIn: floorInTime,
               floorOut: "--",
               status: "In Progress",
               hasClockedIn: true,

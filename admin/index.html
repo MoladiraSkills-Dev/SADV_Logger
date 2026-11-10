@@ -84,8 +84,9 @@
       <button type="button" id="btn-monthlyTab" class="tab-btn" onclick="switchAdminTab('monthlyTab')">
         Monthly Summaries
       </button>
-      <button type="button" id="btn-leaveTab" class="tab-btn" onclick="switchAdminTab('leaveTab')">
-        Leave Applications
+      <button type="button" id="btn-leaveTab" class="tab-btn" onclick="switchAdminTab('leaveTab')" style="display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;">
+        <span>Leave Applications</span>
+        <span id="adminLeaveBadge" class="badge badge-warning hidden" style="font-size: 0.7rem; padding: 0.15rem 0.45rem; border-radius: 999px;">0</span>
       </button>
       <button type="button" id="btn-usersTab" class="tab-btn" onclick="switchAdminTab('usersTab')">
         Staff Directory
@@ -156,7 +157,7 @@
             Daily Shifts &amp; Floor Times
           </h2>
           <span style="font-size: 0.7rem; color: var(--text-muted);">
-            Floor Rules: Exact clock-in (HH:mm, no seconds) &bull; Standard end: 17:00 / Sat 13:00 &bull; -1h lunch deduction Mon-Fri
+            Floor Rules: 08:00 floor if clock-in is early (actual HH:mm if past 08:00) &bull; Standard end: 17:00 / Sat 13:00 &bull; -1h lunch deduction Mon-Fri
           </span>
         </div>
 

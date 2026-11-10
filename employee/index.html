@@ -57,7 +57,7 @@
               <span class="clock-btn-icon">⏱️</span>
               <div>
                 <span class="clock-btn-title">Clock In</span>
-                <span class="clock-btn-subtitle" id="clockInSubtitle">Record Exact Morning Floor Time</span>
+                <span class="clock-btn-subtitle" id="clockInSubtitle">Standard Floor: 08:00 (or actual time if after 08:00)</span>
               </div>
             </div>
             <div class="action-btn-right">
@@ -82,8 +82,9 @@
         </section>
 
         <!-- Leave Registration Action -->
-        <button type="button" class="btn btn-secondary btn-block" id="btnOpenLeave" onclick="openLeaveModal()" style="padding: 0.85rem; border-radius: var(--radius-md); font-weight: 700; margin-bottom: 1.25rem;">
-          📅 Register Leave Application
+        <button type="button" class="btn btn-secondary btn-block" id="btnOpenLeave" onclick="openLeaveModal()" style="padding: 0.85rem; border-radius: var(--radius-md); font-weight: 700; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; position: relative;">
+          <span>📅 Register Leave Application</span>
+          <span id="employeeLeaveBadge" class="badge badge-warning hidden" style="font-size: 0.72rem; padding: 0.2rem 0.55rem; border-radius: 999px;">0 Pending</span>
         </button>
 
         <!-- Geolocation Advisory Notice -->
@@ -113,7 +114,7 @@
         <button type="button" class="modal-close" onclick="closeLeaveModal()" aria-label="Close modal">&times;</button>
       </div>
 
-      <form id="leaveForm" onsubmit="handleLeaveSubmit(event, null)">
+      <form id="leaveForm" onsubmit="handleLeaveSubmit(event, fetchTodayShiftStatus)">
         <div class="modal-body">
           <div id="leaveAlert" class="alert hidden" role="alert"></div>
 

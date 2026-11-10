@@ -73,6 +73,7 @@ async function loadAdminDashboard() {
       // Render tables
       renderStaffProfilesTable(res.employees);
       renderLeaveRequestsTable(CACHED_LEAVE_ARRAY);
+      updateAdminLeaveBadge(CACHED_LEAVE_ARRAY);
       applyAdminLogFilters();
       applyAdminSummaryFilters();
       applyAdminWeeklyFilters();
@@ -637,6 +638,18 @@ function renderMonthlyTable(monthlyData) {
 /* ==========================================================================
    TAB 5: LEAVE APPLICATIONS
    ========================================================================== */
+
+function updateAdminLeaveBadge(requests) {
+  const badge = document.getElementById("adminLeaveBadge");
+  if (!badge) return;
+  const pendingCount = (requests || []).filter(r => r.status === "Pending").length;
+  if (pendingCount > 0) {
+    badge.innerText = pendingCount;
+    badge.classList.remove("hidden");
+  } else {
+    badge.classList.add("hidden");
+  }
+}
 
 function renderLeaveRequestsTable(requests) {
   const tbody = document.getElementById("leaveTableBody");
